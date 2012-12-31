@@ -1,0 +1,40 @@
+#include <Arduino.h>
+#include <TestClassShared.h>
+#include <TestClass2.h>
+#include <TestClass1.h>
+
+TestClass1 myClass1;
+TestClass2 myClass2;
+
+char mySetupMessage [] PROGMEM = "These is my setup message from TestSharedVariable";
+
+void setup()
+{
+  Serial.begin(9600);
+  Serial.print(F("PI = "));Serial.println(TestClassShared::mySharedPI);
+  strcpy_P (TestClassShared::mySharedBuffer, mySetupMessage);
+  Serial.print("At setup mySharedVariable = ");Serial.println(TestClassShared::mySharedLength);
+  strcpy_P (TestClassShared::mySharedBuffer, mySetupMessage);
+  Serial.println(TestClassShared::mySharedBuffer);
+  Serial.print("sizeof shared buffer = ");Serial.println(sizeof(TestClassShared::mySharedBuffer));
+  Serial.print(F("mySharedLength = "));Serial.println(TestClassShared::mySharedLength);
+} // void setup()
+
+char myLoopMessage [] PROGMEM = "This is my message from TestSharedVariable";
+
+void loop()
+{
+  Serial.println("ENTER loop()");
+  strcpy_P (TestClassShared::mySharedBuffer, myLoopMessage);
+  Serial.println(TestClassShared::mySharedBuffer);
+  TestClassShared::mySharedVariable += 1;
+  Serial.println("calling TestClass1 ");
+  Serial.println(myClass1.myMethod());
+  TestClassShared::mySharedVariable += 2;
+  Serial.println("calling TestClass2 ");
+  Serial.println(myClass2.myMethod());
+  strcpy_P (TestClassShared::mySharedBuffer, myLoopMessage);
+  Serial.println(TestClassShared::mySharedBuffer);
+  Serial.println("LEAVE loop()");
+  delay(5000);
+} // void loop

@@ -1,0 +1,60 @@
+
+PI = 3.14
+At setup mySharedVariable = 80
+These is my setup message from TestSharedVariable
+sizeof shared buffer = 80
+mySharedLength = 80
+ENTER loop()
+This is my message from TestSharedVariable
+calling TestClass1 
+ENTER TestClass1.myMethod()
+enter buffer contents 'This is my message from TestSharedVariable'
+mySharedVariable = 6
+leave buffer contents 'This is a message from Test 1'
+LEAVE TestClass1.myMethod()
+7
+calling TestClass2 
+ENTER TestClass2.myMethod()
+enter buffer contents 'This is a message from Test 1'
+mySharedVariable = 9
+leave buffer contents 'This is a message from Test 2'
+LEAVE TestClass2.myMethod()
+11
+This is my message from TestSharedVariable
+LEAVE loop()
+ENTER loop()
+This is my message from TestSharedVariable
+calling TestClass1 
+ENTER TestClass1.myMethod()
+enter buffer contents 'This is my message from TestSharedVariable'
+mySharedVariable = 12
+leave buffer contents 'This is a message from Test 1'
+LEAVE TestClass1.myMethod()
+13
+calling TestClass2 
+ENTER TestClass2.myMethod()
+enter buffer contents 'This is a message from Test 1'
+mySharedVariable = 15
+leave buffer contents 'This is a message from Test 2'
+LEAVE TestClass2.myMethod()
+17
+This is my message from TestSharedVariable
+LEAVE loop()
+ENTER loop()
+This is my message from TestSharedVariable
+calling TestClass1 
+ENTER TestClass1.myMethod()
+enter buffer contents 'This is my message from TestSharedVariable'
+mySharedVariable = 18
+leave buffer contents 'This is a message from Test 1'
+LEAVE TestClass1.myMethod()
+19
+calling TestClass2 
+ENTER TestClass2.myMethod()
+enter buffer contents 'This is a message from Test 1'
+mySharedVariable = 21
+leave buffer contents 'This is a message from Test 2'
+LEAVE TestClass2.myMethod()
+23
+This is my message from TestSharedVariable
+LEAVE loop()
