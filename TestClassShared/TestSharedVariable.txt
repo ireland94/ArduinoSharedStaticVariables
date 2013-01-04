@@ -1,0 +1,206 @@
+//
+// These 7 files are a working example of how to share a single instance
+// variable across multiple classes.  I use this message to share a char[]
+// that is used for error messages. I have all the messages in PROGMEM, then
+// use a shared static variable msgBuffer so I only consume a single buffer
+// across all the modules.
+//
+
+//
+// TestSharedVariable Sketch
+//
+
+#include <Arduino.h>
+#include <TestClassShared.h>
+#include <TestClass2.h>
+#include <TestClass1.h>
+
+TestClass1 myClass1;
+TestClass2 myClass2;
+
+char mySetupMessage [] PROGMEM = "These is my setup message from TestSharedVariable";
+
+void setup()
+{
+  Serial.begin(9600);
+  Serial.print(F("PI = "));Serial.println(TestClassShared::mySharedPI);
+  strcpy_P (TestClassShared::mySharedBuffer, mySetupMessage);
+  Serial.print("At setup mySharedVariable = ");Serial.println(TestClassShared::mySharedLength);
+  strcpy_P (TestClassShared::mySharedBuffer, mySetupMessage);
+  Serial.println(TestClassShared::mySharedBuffer);
+  Serial.print("sizeof shared buffer = ");Serial.println(sizeof(TestClassShared::mySharedBuffer));
+  Serial.print(F("mySharedLength = "));Serial.println(TestClassShared::mySharedLength);
+} // void setup()
+
+char myLoopMessage [] PROGMEM = "This is my message from TestSharedVariable";
+
+void loop()
+{
+  Serial.println("ENTER loop()");
+  strcpy_P (TestClassShared::mySharedBuffer, myLoopMessage);
+  Serial.println(TestClassShared::mySharedBuffer);
+  TestClassShared::mySharedVariable += 1;
+  Serial.println("calling TestClass1 ");
+  Serial.println(myClass1.myMethod());
+  TestClassShared::mySharedVariable += 2;
+  Serial.println("calling TestClass2 ");
+  Serial.println(myClass2.myMethod());
+  strcpy_P (TestClassShared::mySharedBuffer, myLoopMessage);
+  Serial.println(TestClassShared::mySharedBuffer);
+  Serial.println("LEAVE loop()");
+  delay(5000);
+} // void loop
+//
+// File: TestClassShare.h
+//
+
+#ifndef TestClassShared_h
+#define TestClassShared_h
+#define MY_MESSAGE_BUFFER_LENGTH        80
+class TestClassShared
+{
+  public:
+    static float mySharedPI;
+    static short mySharedLength;
+    static char  mySharedBuffer[MY_MESSAGE_BUFFER_LENGTH];
+    static int   mySharedVariable;
+};
+#endif
+
+//
+// File: TestClassShare.cpp
+//
+#include "TestClassShared.h"
+float TestClassShared::mySharedPI = 3.14159;
+int   TestClassShared::mySharedVariable = 5;
+short TestClassShared::mySharedLength = MY_MESSAGE_BUFFER_LENGTH;
+char  TestClassShared::mySharedBuffer[];
+
+//
+// File: TestClass1.h
+//
+
+#ifndef TestClass1_h
+#define TestClass1_h
+class TestClass1
+{
+  public:
+    int myMethod(void);
+};
+#endif
+
+//
+// File: TestClass1.cpp
+//
+#include "Arduino.h"
+#include "TestClass1.h"
+#include "TestClassShared.h"
+prog_char msgFromTest1 [] PROGMEM = "This is a message from Test 1";
+int TestClass1::myMethod()
+{
+  Serial.println("ENTER TestClass1.myMethod()");
+  Serial.print("enter buffer contents '");Serial.print(TestClassShared::mySharedBuffer);Serial.println("'");
+  Serial.print("mySharedVariable = ");Serial.println(TestClassShared::mySharedVariable);
+  TestClassShared::mySharedVariable += 1;
+  strcpy_P (TestClassShared::mySharedBuffer, msgFromTest1);
+  Serial.print("leave buffer contents '");Serial.print(TestClassShared::mySharedBuffer);Serial.println("'");
+  Serial.println("LEAVE TestClass1.myMethod()");
+  return TestClassShared::mySharedVariable;
+}
+
+//
+// File: TestClass2.h
+//
+
+#ifndef TestClass2_h
+#define TestClass2_h
+class TestClass2
+{
+  public:
+    int myMethod(void);
+};
+#endif
+
+//
+// File: TestClass2.cpp
+//
+
+#include "Arduino.h"
+#include "TestClass2.h"
+#include "TestClassShared.h"
+prog_char msgFromTest2 [] PROGMEM = "This is a message from Test 2";
+int TestClass2::myMethod()
+{
+  Serial.println("ENTER TestClass2.myMethod()");
+  Serial.print("enter buffer contents '");Serial.print(TestClassShared::mySharedBuffer);Serial.println("'");
+  Serial.print("mySharedVariable = ");Serial.println(TestClassShared::mySharedVariable);
+  TestClassShared::mySharedVariable += 2;
+  strcpy_P (TestClassShared::mySharedBuffer, msgFromTest2);
+  Serial.print("leave buffer contents '");Serial.print(TestClassShared::mySharedBuffer);Serial.println("'");
+  Serial.println("LEAVE TestClass2.myMethod()");
+  return TestClassShared::mySharedVariable;
+}
+
+//
+// Serial Monitor Trace
+//
+
+PI = 3.14
+At setup mySharedVariable = 80
+These is my setup message from TestSharedVariable
+sizeof shared buffer = 80
+mySharedLength = 80
+ENTER loop()
+This is my message from TestSharedVariable
+calling TestClass1 
+ENTER TestClass1.myMethod()
+enter buffer contents 'This is my message from TestSharedVariable'
+mySharedVariable = 6
+leave buffer contents 'This is a message from Test 1'
+LEAVE TestClass1.myMethod()
+7
+calling TestClass2 
+ENTER TestClass2.myMethod()
+enter buffer contents 'This is a message from Test 1'
+mySharedVariable = 9
+leave buffer contents 'This is a message from Test 2'
+LEAVE TestClass2.myMethod()
+11
+This is my message from TestSharedVariable
+LEAVE loop()
+ENTER loop()
+This is my message from TestSharedVariable
+calling TestClass1 
+ENTER TestClass1.myMethod()
+enter buffer contents 'This is my message from TestSharedVariable'
+mySharedVariable = 12
+leave buffer contents 'This is a message from Test 1'
+LEAVE TestClass1.myMethod()
+13
+calling TestClass2 
+ENTER TestClass2.myMethod()
+enter buffer contents 'This is a message from Test 1'
+mySharedVariable = 15
+leave buffer contents 'This is a message from Test 2'
+LEAVE TestClass2.myMethod()
+17
+This is my message from TestSharedVariable
+LEAVE loop()
+ENTER loop()
+This is my message from TestSharedVariable
+calling TestClass1 
+ENTER TestClass1.myMethod()
+enter buffer contents 'This is my message from TestSharedVariable'
+mySharedVariable = 18
+leave buffer contents 'This is a message from Test 1'
+LEAVE TestClass1.myMethod()
+19
+calling TestClass2 
+ENTER TestClass2.myMethod()
+enter buffer contents 'This is a message from Test 1'
+mySharedVariable = 21
+leave buffer contents 'This is a message from Test 2'
+LEAVE TestClass2.myMethod()
+23
+This is my message from TestSharedVariable
+LEAVE loop()
